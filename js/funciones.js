@@ -104,10 +104,3 @@ const removerDelCarrito = (id) => {
 
     }
 }
-
-
-const contadorCarrito = () => {
-    let basketSizeCarrito = cargarCarritoLS.length();
-
-    document.getElementById("contador").innerHTML = contenidoHTML; 
-}
