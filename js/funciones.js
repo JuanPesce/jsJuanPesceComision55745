@@ -18,69 +18,104 @@ const cargarProductosLS =() => {
     return JSON.parse(localStorage.getItem("productos")) || [];
 }
 
-
-const renderProductos = () => {
-
-    fetch("JSON/productos.JSON")
-    .then(respuesta => respuesta.json())
-    .then(data => {
-        let catalogoHTML ="";
-        data.forEach( unidad =>{
-            catalogoHTML +=`<div class="col-md-4 mb-5">
+const renderProductos = async () => {
+    try {
+      const respuesta = await fetch("JSON/productos.JSON");
+     
+      const data = await respuesta.json();
+      
+      let catalogoHTML = "";
+      data.forEach(unidad => {
+        catalogoHTML += `
+          <div class="col-md-4 mb-5">
             <div class="card" style="width: 18rem;">
-            <img src="${unidad.imagen}" class="card-img-top" alt="${unidad.nombre}">
-            <div class="card-body">
-              <h5 class="card-title">${unidad.nombre}</h5>
-              <p class="card-text">$${unidad.precio}</p>
-              <a href="#" class="btn btn-primary bg-success" onclick="agregarAlCarrito(${unidad.id})">Agregar (+)</a>
+              <img src="${unidad.imagen}" class="card-img-top" alt="${unidad.nombre}">
+              <div class="card-body">
+                <h5 class="card-title">${unidad.nombre}</h5>
+                <p class="card-text">$${unidad.precio}</p>
+                <a href="#" class="btn btn-primary bg-success" onclick="agregarAlCarrito(${unidad.id})">Agregar (+)</a>
+              </div>
             </div>
-          </div>
-          </div>`
-        }
+          </div>`;
+      });
+  
+      document.getElementById("contenido").innerHTML = catalogoHTML;
+    } catch (error) {
+      document.getElementById("contenido").innerHTML = `<div class="alert alert-danger text-center" role="alert"><p>ERROR! No se pudo acceder a la base de datos!<br>${error}</p></div>`;
+    }
+  };
+  
 
-        )
-        document.getElementById("contenido").innerHTML = catalogoHTML; 
+// const renderProductos = () => {
 
-    })
-    .catch(error => {
-        document.getElementById("contenido").innerHTML = `<div class="alert alert-danger text-center" role="alert"><p>ERROR! No se pudo acceder a la base de datos!<br>${error}</p></div>`; 
+//     fetch("JSON/productos.JSON")
+//     .then(respuesta => respuesta.json())
+//     .then(data => {
+//         let catalogoHTML ="";
+//         data.forEach( unidad =>{
+//             catalogoHTML +=`<div class="col-md-4 mb-5">
+//             <div class="card" style="width: 18rem;">
+//             <img src="${unidad.imagen}" class="card-img-top" alt="${unidad.nombre}">
+//             <div class="card-body">
+//               <h5 class="card-title">${unidad.nombre}</h5>
+//               <p class="card-text">$${unidad.precio}</p>
+//               <a href="#" class="btn btn-primary bg-success" onclick="agregarAlCarrito(${unidad.id})">Agregar (+)</a>
+//             </div>
+//           </div>
+//           </div>`
+//         }
+
+//         )
+//         document.getElementById("contenido").innerHTML = catalogoHTML; 
+
+//     })
+//     .catch(error => {
+//         document.getElementById("contenido").innerHTML = `<div class="alert alert-danger text-center" role="alert"><p>ERROR! No se pudo acceder a la base de datos!<br>${error}</p></div>`; 
         
-    })
+//     })
 
-    // const productos = cargarProductosLS(); 
+// const productos = cargarProductosLS(); 
 
-    // let contenidoHTML ="";
+//     let contenidoHTML ="";
     
-    // productos.forEach(producto => {
-    //     contenidoHTML +=`<div class="col-md-4 mb-5">
-    //     <div class="card" style="width: 18rem;">
-    //     <img src="${producto.imagen}" class="card-img-top" alt="${producto.nombre}">
-    //     <div class="card-body">
-    //       <h5 class="card-title">${producto.nombre}</h5>
-    //       <p class="card-text">$${producto.precio}</p>
-    //       <a href="#" class="btn btn-primary bg-success" onclick="agregarAlCarrito(${producto.id})">Agregar (+)</a>
-    //     </div>
-    //   </div>
-    //   </div>`
-    // });
+//     productos.forEach(producto => {
+//         contenidoHTML +=`<div class="col-md-4 mb-5">
+//         <div class="card" style="width: 18rem;">
+//         <img src="${producto.imagen}" class="card-img-top" alt="${producto.nombre}">
+//         <div class="card-body">
+//           <h5 class="card-title">${producto.nombre}</h5>
+//           <p class="card-text">$${producto.precio}</p>
+//           <a href="#" class="btn btn-primary bg-success" onclick="agregarAlCarrito(${producto.id})">Agregar (+)</a>
+//         </div>
+//       </div>
+//       </div>`
+//     });
 
-    // document.getElementById("contenido").innerHTML = contenidoHTML; 
-}
+//     document.getElementById("contenido").innerHTML = contenidoHTML; 
+// }
 
 const renderCarrito = () => {
     const productos = cargarCarritoLS(); 
 
-    let contenidoHTML =`<table class="table"`;
+    let contenidoHTML =`<table class="table">`;
     
     productos.forEach(producto => {
         contenidoHTML +=` <tr>
         <td><img src="${producto.imagen}" alt="${producto.nombre}" width="72"></td>
-        <td ><h5 class="card-title d-flex align-items-center" width ="32">${producto.nombre}</h5></td>
-        <td><p class="card-text">$${producto.precio}</p></td>
-        <td><img class="btn" src="recursos/trash3.svg" onclick="removerDelCarrito(${producto.id})" alt="Eliminar" width="52"></td>
+        <td class="align-middle" ><h5 class="card-title d-flex align-items-center" width ="32">${producto.nombre}</h5></td>
+        <td class="align-middle"><h5 class="card-text">${producto.gramos} gr</h5></td>
+        <td class="align-middle"><h5 class="card-text">$${producto.precio}</h5></td>
+        <td class="align-middle text-end"><img class="btn" src="recursos/trash3.svg" onclick="removerDelCarrito(${producto.id})" alt="Eliminar" width="52"></td>
         </tr>`;
     });
 
+    contenidoHTML += `<tr>
+    <td>&nbsp;</td>
+    <td>Total</td>
+    <td colspan="2"><b>${sumaPesoCarrito()} gr</b></td>
+    <td><b>$${sumaProductosCarrito()}</b></td>
+    </tr>    
+    </table>`;
     document.getElementById("contenido").innerHTML = contenidoHTML; 
 }
 
@@ -95,6 +130,7 @@ const agregarAlCarrito = (id) => {
     let producto = buscarProducto(id);
     carrito.push(producto);
     guardarCarritoLS(carrito);
+    renderBotonCarrito();
     
 }
 
@@ -131,3 +167,31 @@ const removerDelCarrito = (id) => {
 
     }
 }
+
+const cantProductosCarrito = () => {
+    const carrito = cargarCarritoLS();
+
+    return carrito.length;
+}
+
+const sumaProductosCarrito = () => {
+    const carrito = cargarCarritoLS();
+
+    return carrito.reduce((acumulador, item) => acumulador += item.precio, 0);
+}
+
+const sumaPesoCarrito = () => {
+    const carrito = cargarCarritoLS();
+
+    return carrito.reduce((acumulador, item) => acumulador += item.gramos, 0);
+}
+
+const renderBotonCarrito = () => {
+    let totalCarrito = document.getElementById("totalCarrito");
+    totalCarrito.innerHTML = cantProductosCarrito();
+    console.log();
+}
+
+
+
+
