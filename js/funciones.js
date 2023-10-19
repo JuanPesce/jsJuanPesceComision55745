@@ -32,7 +32,7 @@ const renderProductos = async () => {
               <div class="card-body">
                 <h5 class="card-title">${unidad.nombre}</h5>
                 <p class="card-text">$${unidad.precio}</p>
-                <a href="#" class="btn btn-primary bg-success" onclick="agregarAlCarrito(${unidad.id})">Agregar (+)</a>
+                <a href="#" id="btnAgregar" class="btn btn-primary bg-success" onclick="agregarAlCarrito(${unidad.id})">Agregar (+)</a>
               </div>
             </div>
           </div>`;
@@ -109,6 +109,20 @@ const agregarAlCarrito = (id) => {
         producto.cantidad = 1;
         carrito.push(producto);
     }
+    
+    Toastify({
+        text: "Se Agrego Item al Carrito",
+        duration: 2000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "center", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();
+
 
     guardarCarritoLS(carrito);
     renderBotonCarrito();
