@@ -53,7 +53,7 @@ const renderCarrito = () => {
     if (cantProductosCarrito() > 0) {
         contenidoHTML = `<table class="table">
         <tr>
-        <td colspan="7" class="text-end"><button class="btn btn-warning" onclick="vaciarCarrito()" title="Vaciar Carrito">Vaciar Carrito [x]</button></td>
+        <td colspan="7" class="text-end"><button class="btn btn-success " onclick="vaciarCarrito()" title="Vaciar Carrito">Vaciar Carrito [x]</button></td>
         </tr>`;
 
         productos.forEach(producto => {
@@ -61,7 +61,8 @@ const renderCarrito = () => {
         <td><img src="${producto.imagen}" alt="${producto.nombre}" width="72"></td>
         <td class="align-middle" ><h5 class="card-title d-flex align-items-center" width ="32">${producto.nombre}</h5></td>
         <td class="align-middle"><h5 class="card-text">${producto.gramos} gr</h5></td>
-        <td class="align-middle"><h5 class="card-text">$${producto.precio}</h5></td>
+        <td class="align-middle"><button class="btn btn-success rounded-circle" onclick="decrementarCantidadProducto(${producto.id})">-</button> ${producto.cantidad} <button class="btn btn-success rounded-circle" onclick="incrementarCantidadProducto(${producto.id})">+</button></td>
+        <td class="align-middle">$${producto.precio * producto.cantidad}</td>
         <td class="align-middle text-end"><img class="btn" src="recursos/trash3.svg" onclick="removerDelCarrito(${producto.id})" alt="Eliminar" width="52"></td>
         </tr>`;
     });
@@ -86,29 +87,65 @@ const cargarCarritoLS =() => {
     return JSON.parse(localStorage.getItem("carrito")) || [];
 }
 
+const vaciarCarrito = () => {
+    localStorage.removeItem("carrito");
+    renderCarrito();
+    renderBotonCarrito();
+}
+
 const agregarAlCarrito = (id) => {
-    const carrito = cargarCarritoLS();
-    let producto = buscarProducto(id);
-    carrito.push(producto);
-    // guardarCarritoLS(carrito);
-    // renderBotonCarrito();
-    
-    console.log("hola1");
-
     // const carrito = cargarCarritoLS();
+    // let producto = buscarProducto(id);
+    // carrito.push(producto);
+    // // guardarCarritoLS(carrito);
+    // // renderBotonCarrito();
+    
+    const carrito = cargarCarritoLS();
 
-    // if (estaEnElCarrito(id)) {
-    //     const producto = carrito.find(item => item.id === id);
-    //     producto.cantidad += 1;
-    // } else {
-    //     const producto = buscarProducto(id);
-    //     producto.cantidad = 1;
-    //     carrito.push(producto);
-    // }
+    if (estaEnElCarrito(id)) {
+        const producto = carrito.find(item => item.id === id);
+        producto.cantidad += 1;
+    } else {
+        const producto = buscarProducto(id);
+        producto.cantidad = 1;
+        carrito.push(producto);
+    }
 
     guardarCarritoLS(carrito);
     renderBotonCarrito();
 }
+
+const eliminarProductoCarrito = (id) => {
+    const carrito = cargarCarritoLS();
+    const nuevoCarrito = carrito.filter(item => item.id !== id);
+    guardarCarritoLS(nuevoCarrito);
+    renderCarrito();
+    renderBotonCarrito();
+}
+
+const incrementarCantidadProducto = (id) => {
+    const carrito = cargarCarritoLS();
+    const producto = carrito.find(item => item.id === id);
+    producto.cantidad += 1;
+    guardarCarritoLS(carrito);
+    renderCarrito();
+    renderBotonCarrito();
+}
+
+const decrementarCantidadProducto = (id) => {
+    const carrito = cargarCarritoLS();
+    const producto = carrito.find(item => item.id === id);
+
+    if (producto.cantidad > 1) {
+        producto.cantidad -= 1;
+        guardarCarritoLS(carrito);
+        renderCarrito();
+        renderBotonCarrito();
+    } else {
+        eliminarProductoCarrito(id);
+    }
+}
+
 
 
 const buscarProducto = (id) => {
@@ -118,10 +155,11 @@ const buscarProducto = (id) => {
     return producto;
 }
 
-const estaEnElCarrito = (id) => {
-    const productos = cargarProductosLS(id);
 
-    return productos.some(item => item.id === id);
+const estaEnElCarrito = (id) => {
+    const productos = cargarCarritoLS();
+
+    return productos.some(item => item.id === id);;
 }
 
 const guardarCarritoLS = (carrito) => {
@@ -142,24 +180,26 @@ const removerDelCarrito = (id) => {
         renderCarrito();
 
     }
+
+    renderBotonCarrito();
 }
 
 const cantProductosCarrito = () => {
     const carrito = cargarCarritoLS();
 
-    return carrito.length;
+    return carrito.reduce((acumulador, item) => acumulador += item.cantidad, 0);
 }
 
 const sumaProductosCarrito = () => {
     const carrito = cargarCarritoLS();
 
-    return carrito.reduce((acumulador, item) => acumulador += item.precio, 0);
+    return carrito.reduce((acumulador, item) => acumulador += item.precio * item.cantidad, 0);
 }
 
 const sumaPesoCarrito = () => {
     const carrito = cargarCarritoLS();
 
-    return carrito.reduce((acumulador, item) => acumulador += item.gramos, 0);
+    return carrito.reduce((acumulador, item) => acumulador += item.gramos * item.cantidad, 0);
 }
 
 const renderBotonCarrito = () => {
