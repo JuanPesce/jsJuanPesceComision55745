@@ -47,12 +47,16 @@ const renderProductos = async () => {
   
 
 const renderCarrito = () => {
-    const productos = cargarCarritoLS(); 
+    const productos = cargarCarritoLS();
     let contenidoHTML;
-    if(cantProductosCarrito()>0){
-    contenidoHTML =`<table class="table">`;
-    
-    productos.forEach(producto => {
+
+    if (cantProductosCarrito() > 0) {
+        contenidoHTML = `<table class="table">
+        <tr>
+        <td colspan="7" class="text-end"><button class="btn btn-warning" onclick="vaciarCarrito()" title="Vaciar Carrito">Vaciar Carrito [x]</button></td>
+        </tr>`;
+
+        productos.forEach(producto => {
         contenidoHTML +=` <tr>
         <td><img src="${producto.imagen}" alt="${producto.nombre}" width="72"></td>
         <td class="align-middle" ><h5 class="card-title d-flex align-items-center" width ="32">${producto.nombre}</h5></td>
@@ -86,9 +90,24 @@ const agregarAlCarrito = (id) => {
     const carrito = cargarCarritoLS();
     let producto = buscarProducto(id);
     carrito.push(producto);
+    // guardarCarritoLS(carrito);
+    // renderBotonCarrito();
+    
+    console.log("hola1");
+
+    // const carrito = cargarCarritoLS();
+
+    // if (estaEnElCarrito(id)) {
+    //     const producto = carrito.find(item => item.id === id);
+    //     producto.cantidad += 1;
+    // } else {
+    //     const producto = buscarProducto(id);
+    //     producto.cantidad = 1;
+    //     carrito.push(producto);
+    // }
+
     guardarCarritoLS(carrito);
     renderBotonCarrito();
-    
 }
 
 
