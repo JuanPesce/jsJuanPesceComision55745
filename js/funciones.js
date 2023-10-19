@@ -20,24 +20,51 @@ const cargarProductosLS =() => {
 
 
 const renderProductos = () => {
-    const productos = cargarProductosLS(); 
 
-    let contenidoHTML ="";
+    fetch("JSON/productos.JSON")
+    .then(respuesta => respuesta.json())
+    .then(data => {
+        let catalogoHTML ="";
+        data.forEach( unidad =>{
+            catalogoHTML +=`<div class="col-md-4 mb-5">
+            <div class="card" style="width: 18rem;">
+            <img src="${unidad.imagen}" class="card-img-top" alt="${unidad.nombre}">
+            <div class="card-body">
+              <h5 class="card-title">${unidad.nombre}</h5>
+              <p class="card-text">$${unidad.precio}</p>
+              <a href="#" class="btn btn-primary bg-success" onclick="agregarAlCarrito(${unidad.id})">Agregar (+)</a>
+            </div>
+          </div>
+          </div>`
+        }
+
+        )
+        document.getElementById("contenido").innerHTML = catalogoHTML; 
+
+    })
+    .catch(error => {
+        document.getElementById("contenido").innerHTML = `<div class="alert alert-danger text-center" role="alert"><p>ERROR! No se pudo acceder a la base de datos!<br>${error}</p></div>`; 
+        
+    })
+
+    // const productos = cargarProductosLS(); 
+
+    // let contenidoHTML ="";
     
-    productos.forEach(producto => {
-        contenidoHTML +=`<div class="col-md-4 mb-5">
-        <div class="card" style="width: 18rem;">
-        <img src="${producto.imagen}" class="card-img-top" alt="${producto.nombre}">
-        <div class="card-body">
-          <h5 class="card-title">${producto.nombre}</h5>
-          <p class="card-text">$${producto.precio}</p>
-          <a href="#" class="btn btn-primary bg-success" onclick="agregarAlCarrito(${producto.id})">Agregar (+)</a>
-        </div>
-      </div>
-      </div>`
-    });
+    // productos.forEach(producto => {
+    //     contenidoHTML +=`<div class="col-md-4 mb-5">
+    //     <div class="card" style="width: 18rem;">
+    //     <img src="${producto.imagen}" class="card-img-top" alt="${producto.nombre}">
+    //     <div class="card-body">
+    //       <h5 class="card-title">${producto.nombre}</h5>
+    //       <p class="card-text">$${producto.precio}</p>
+    //       <a href="#" class="btn btn-primary bg-success" onclick="agregarAlCarrito(${producto.id})">Agregar (+)</a>
+    //     </div>
+    //   </div>
+    //   </div>`
+    // });
 
-    document.getElementById("contenido").innerHTML = contenidoHTML; 
+    // document.getElementById("contenido").innerHTML = contenidoHTML; 
 }
 
 const renderCarrito = () => {
